@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LKPD Digital Interaktif - Kinematika & Energi Motor Listrik</title>
+<!-- KaTeX for Math Rendering -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex-auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; color: #1e293b; line-height: 1.6; }
+.container { max-width: 960px; margin: 20px auto; padding: 15px; }
+
+/* HEADER */
+.main-header { background: linear-gradient(135deg, #0f172a, #1e3a8a); color: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); margin-bottom: 25px; }
+.main-header h1 { margin: 0 0 10px; font-size: 28px; font-weight: 700; }
+.main-header p { margin: 0; opacity: 0.9; font-size: 15px; }
+
+/* NAV / STEPPER */
+.nav-steps { display: flex; gap: 8px; margin-bottom: 25px; overflow-x: auto; padding-bottom: 5px; }
+.step-tab { flex: 1; min-width: 120px; padding: 12px 8px; background: white; border: 1px solid #cbd5e1; border-radius: 12px; text-align: center; font-size: 13px; font-weight: 600; color: #64748b; cursor: pointer; transition: all 0.2s; }
+.step-tab.active { background: #2563eb; color: white; border-color: #2563eb; box-shadow: 0 4px 12px rgba(37,99,235,0.25); }
+
+/* CARDS & SECTIONS */
+.card { background: white; padding: 25px; border-radius: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; border: 1px solid #e2e8f0; }
+.section-page { display: none; }
+.section-page.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+h2 { color: #0f172a; margin-top: 0; font-size: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+h3 { color: #1e3a8a; font-size: 17px; margin-top: 20px; }
+
+/* FORM INPUTS */
+.form-group { margin-bottom: 18px; }
+label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; color: #334155; }
+input[type="text"], textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px; font-family: inherit; font-size: 14px; transition: border-color 0.2s; }
+input[type="text"]:focus, textarea:focus { border-color: #2563eb; outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+textarea { min-height: 90px; resize: vertical; }
+
+/* SIMULASI 1 - MOTOR */
+.scene-1 { overflow: hidden; border-radius: 16px; border: 1px solid #cbd5e1; background: linear-gradient(#dff1ff 0 54%,#eef0f2 54%); padding: 20px; position: relative; }
+.sky-1 { height: 180px; position: relative; }
+.cloud { position: absolute; background: white; border-radius: 30px; width: 80px; height: 24px; opacity: .85; }
+.cloud:before { content:""; position:absolute; width:32px; height:32px; background:white; border-radius:50%; left:15px; top:-12px; }
+.c1 { left: 10%; top: 20px; } .c2 { right: 12%; top: 50px; transform: scale(.8); }
+.road-1 { position: absolute; left:0; right:0; bottom:0; height:60px; background:#656b73; border-top:4px solid #4e545b; }
+.roadline-1 { position: absolute; left:0; right:0; top:28px; border-top:4px dashed white; }
+.mark { position: absolute; top: -30px; font-weight: bold; font-size: 12px; color: #344054; }
+.mark.a{left:2%}.mark.b{left:34%}.mark.c{left:67%}.mark.d{right:1%}
+.motor { position: absolute; left:2%; bottom:15px; width:80px; height:50px; z-index:5; transition: left 0.05s linear; }
+.wheel { position: absolute; bottom:0; width:20px; height:20px; border:3px solid #1d2329; border-radius:50%; background:#cbd0d6; }
+.w1{left:8px}.w2{right:7px}
+.body-m { position: absolute; left:25px; bottom:25px; width:32px; height:13px; background:#344d60; border-radius:10px 15px 4px 6px; }
+
+/* SIMULASI 2 - PANEL SURYA */
+.stage-2 { height: 220px; position: relative; background: linear-gradient(#dff2ff 0 100%); border-radius: 16px; overflow: hidden; border: 1px solid #cbd5e1; }
+.sun-2 { position: absolute; right: 8%; top: 15px; font-size: 45px; }
+.panel-2 { position: absolute; left: 8%; top: 50px; width: 180px; height: 100px; background: repeating-linear-gradient(90deg,#24567e 0 16px,#aac5d8 17px 18px); border: 5px solid #263847; transform: skew(-8deg); }
+.ray { position: absolute; color: #f5a900; font-size: 22px; animation: r 1s infinite alternate; }
+.r1{left:18%;top:28%}.r2{left:26%;top:24%}.r3{left:32%;top:32%}
+@keyframes r{to{transform:translateY(6px)}}
+.wire-2 { position: absolute; left: 28%; top: 145px; width: 140px; height: 40px; border-bottom: 4px solid #1976c5; border-right: 4px solid #1976c5; border-radius: 0 0 20px 0; }
+.controller-2 { position: absolute; left: 42%; top: 160px; background: #35434f; color: white; border: 3px solid #202830; border-radius: 8px; padding: 6px; width: 110px; text-align: center; font-size: 11px; font-weight: bold; }
+.battery-2 { position: absolute; right: 8%; top: 150px; background: #303d48; color: white; border: 3px solid #202830; border-radius: 8px; padding: 8px; width: 130px; text-align: center; font-size: 12px; font-weight: bold; }
+.bar-2 { height: 10px; background: #4ade80; width: 0%; margin-top: 6px; border-radius: 6px; transition: width 0.1s; }
+
+/* SIMULASI 3 - MOBIL & GRAFIK */
+.scene-3 { position: relative; height: 180px; overflow: hidden; border-radius: 15px; background: linear-gradient(#dff0ff 0%, #dff0ff 65%, #8bb56e 65%, #8bb56e 76%, #555 76%, #555 100%); }
+.sun-3 { position: absolute; right: 40px; top: 15px; width: 40px; height: 40px; border-radius: 50%; background: #f5b83d; box-shadow: 0 0 20px #f5b83d; }
+.car-3 { position: absolute; left: 5%; bottom: 35px; width: 110px; height: 45px; }
+.car-body-3 { position: absolute; bottom: 8px; left: 8px; width: 95px; height: 30px; background: #e67e22; border-radius: 10px 20px 6px 6px; }
+.car-roof-3 { position: absolute; bottom: 34px; left: 30px; width: 50px; height: 22px; background: #dcecf8; border: 4px solid #e67e22; border-bottom: none; border-radius: 20px 20px 0 0; }
+.wheel-3 { position: absolute; bottom: 0; width: 22px; height: 22px; background: #222; border-radius: 50%; border: 4px solid #777; }
+.w3-1 { left: 15px; } .w3-2 { right: 10px; }
+.speed-box-3 { position: absolute; top: 12px; left: 12px; background: rgba(255,255,255,0.9); padding: 6px 12px; border-radius: 8px; font-weight: bold; font-size: 13px; }
+
+/* CARDS DISPLAY INFO */
+.info-grid { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+.info-card { flex: 1; min-width: 100px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px; text-align: center; }
+.info-val { font-size: 18px; font-weight: bold; color: #1e3a8a; }
+.info-lab { font-size: 11px; color: #64748b; }
+
+/* BUTTONS */
+.btn-group { margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
+button { border: 0; border-radius: 10px; padding: 10px 18px; font-weight: bold; font-size: 14px; cursor: pointer; background: #2563eb; color: white; transition: background 0.2s; }
+button:hover { background: #1d4ed8; }
+button.secondary { background: #e2e8f0; color: #334155; }
+button.secondary:hover { background: #cbd5e1; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* GRID & TABLES */
+.grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media(max-width: 768px) { .grid-2col { grid-template-columns: 1fr; } }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+th, td { padding: 8px 10px; border: 1px solid #cbd5e1; text-align: center; }
+th { background: #1e3a8a; color: white; }
+
+canvas { width: 100%; height: 260px; border: 1px solid #cbd5e1; border-radius: 10px; background: white; margin-top: 10px; }
+
+.question-box { background: #f8fafc; border-left: 4px solid #2563eb; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+.question-box p { margin: 0 0 8px 0; font-weight: 600; }
+
+.footer { text-align: center; font-size: 12px; color: #94a3b8; margin-top: 30px; padding: 15px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  
+  <!-- HEADER UTAMA -->
+  <div class="main-header">
+    <h1>⚡ LKPD Interaktif Kinematika & Energi</h1>
+    <p>Lembar Kerja Peserta Didik Digital - Integrasi Animasi & Analisis Data Motor Listrik</p>
+  </div>
+
+  <!-- TAB NAVIGASI -->
+  <div class="nav-steps">
+    <div class="step-tab active" onclick="switchTab('tab-0')">1. Petunjuk</div>
+    <div class="step-tab" onclick="switchTab('tab-1')">2. Materi</div>
+    <div class="step-tab" onclick="switchTab('tab-2')">3. Kasus 1</div>
+    <div class="step-tab" onclick="switchTab('tab-3')">4. Kasus 2</div>
+    <div class="step-tab" onclick="switchTab('tab-4')">5. Kasus 3</div>
+    <div class="step-tab" onclick="switchTab('tab-5')">6. Refleksi & Kirim</div>
+  </div>
+
+  <!-- BAGIAN 0: IDENTITAS & PETUNJUK -->
+  <div id="tab-0" class="section-page active">
+    <div class="card">
+      <h2>👤 Identitas Mahasiswa</h2>
+      <div class="form-group">
+        <label for="nama">Nama Lengkap Mahasiswa:</label>
+        <input type="text" id="nama" placeholder="Masukkan nama lengkap..." required>
+      </div>
+      <div class="grid-2col">
+        <div class="form-group">
+          <label for="npm">NPM (Nomor Pokok Mahasiswa):</label>
+          <input type="text" id="npm" placeholder="Contoh: 2113021001" required>
+        </div>
+        <div class="form-group">
+          <label for="kelas">Kelas:</label>
+          <input type="text" id="kelas" placeholder="Contoh: Pendidikan Fisika A" required>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🎯 Tujuan Pembelajaran & Langkah Kerja</h2>
+      <h3>Tujuan Pembelajaran:</h3>
+      <ul>
+        <li>Menganalisis hubungan antara jarak, waktu, kecepatan, dan percepatan pada gerak kendaraan listrik.</li>
+        <li>Menghitung konversi energi matahari menjadi energi listrik dan estimasi waktu pengisian baterai.</li>
+        <li>Menganalisis dan menginterpretasikan grafik Kecepatan–Waktu ($v-t$) dari data pengamatan simulasi.</li>
+      </ul>
+      
+      <h3>Langkah-Langkah Pengerjaan:</h3>
+      <ol>
+        <li>Isi data identitas diri di atas dengan benar.</li>
+        <li>Pelajari ringkasan materi ringkas pada Tab 2.</li>
+        <li>Amati animasi interaktif pada Studi Kasus 1, 2, dan 3 secara berurutan.</li>
+        <li>Jawablah pertanyaan-pertanyaan analisis yang disediakan di bawah setiap simulasi.</li>
+        <li>Isi bagian refleksi pada Tab 6, lalu klik tombol <b>"🚀 Kirim Semua Jawaban"</b> untuk menyimpan data ke Spreadsheet dosen.</li>
+      </ol>
+      
+      <div style="text-align: right; margin-top: 15px;">
+        <button onclick="switchTab('tab-1')">Lanjut ke Ringkasan Materi ➡</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BAGIAN 1: RINGKASAN MATERI -->
+  <div id="tab-1" class="section-page">
+    <div class="card">
+      <h2>📚 Ringkasan Materi Fisika</h2>
+      
+      <h3>1. Kinematika Gerak Lurus (GLB & GLBB)</h3>
+      <p>Gerak Lurus Beraturan (GLB) terjadi saat kecepatan benda konstan ($a = 0$):</p>
+      $$\bar{v} = \frac{s}{t}$$
+      <p>Gerak Lurus Berubah Beraturan (GLBB) mengalami percepatan konstan ($a$):</p>
+      $$a = \frac{\Delta v}{\Delta t} = \frac{v_t - v_0}{t}$$
+      $$s = v_0 t + \frac{1}{2} a t^2$$
+
+      <h3>2. Daya dan Energi Listrik</h3>
+      <p>Daya listrik ($P$) pada sistem sel surya atau motor listrik dinyatakan dengan:</p>
+      $$P = V \times I$$
+      <p>Energi listrik ($E$) yang dihasilkan atau dikonsumsi dalam rentang waktu $t$ jam:</p>
+      $$E = P \times t \quad \text{(dalam Wh atau kWh)}$$
+
+      <h3>3. Analisis Grafik Kecepatan - Waktu ($v-t$)</h3>
+      <ul>
+        <li><b>Kemiringan (Gradien) Grafik:</b> Menyatakan percepatan benda ($a = \text{slope}$).</li>
+        <li><b>Luas Daerah di Bawah Grafik:</b> Menyatakan jarak total ($s$) yang ditempuh benda.</li>
+      </ul>
+
+      <div class="btn-group" style="justify-content: space-between; margin-top: 20px;">
+        <button class="secondary" onclick="switchTab('tab-0')">⬅ Kembali</button>
+        <button onclick="switchTab('tab-2')">Masuk Studi Kasus 1 ➡</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BAGIAN 2: STUDI KASUS 1 -->
+  <div id="tab-2" class="section-page">
+    <div class="card">
+      <h2>⚡ Studi Kasus 1: Perjalanan Motor Listrik</h2>
+      <p>Amati perjalanan motor listrik dari titik A menuju titik D. Perhatikan perubahan jarak dan waktu.</p>
+      
+      <div class="scene-1">
+        <div class="sky-1">
+          <div class="cloud c1"></div>
+          <div class="cloud c2"></div>
+          <div class="road-1">
+            <div class="roadline-1"></div>
+            <div class="mark a">A — 0 m</div>
+            <div class="mark b">B — 100 m</div>
+            <div class="mark c">C — 200 m</div>
+            <div class="mark d">D — 300 m</div>
+            <div id="motor1" class="motor">
+              <div class="wheel w1"></div>
+              <div class="wheel w2"></div>
+              <div class="body-m"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card"><div id="dist1" class="info-val">0 m</div><div class="info-lab">Jarak Tempuh</div></div>
+        <div class="info-card"><div id="time1" class="info-val">0 s</div><div class="info-lab">Waktu (t)</div></div>
+      </div>
+
+      <div class="btn-group">
+        <button onclick="startSim1()">▶ Mulai Animasi</button>
+        <button class="secondary" onclick="pauseSim1()">Ⅱ Jeda</button>
+        <button class="secondary" onclick="resetSim1()">↻ Ulangi</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📝 Pertanyaan Analisis Kasus 1</h2>
+      
+      <div class="question-box">
+        <p>1. Berapa jarak total yang ditempuh motor listrik dari titik A sampai titik D?</p>
+        <input type="text" id="k1_q1" placeholder="Tuliskan jawaban Anda...">
+      </div>
+
+      <div class="question-box">
+        <p>2. Motor menempuh jarak tersebut dalam waktu 20 detik. Berapa kecepatan rata-rata motor listrik?</p>
+        <textarea id="k1_q2" placeholder="Tuliskan langkah perhitungan dan jawaban akhir..."></textarea>
+      </div>
+
+      <div class="question-box">
+        <p>3. Pada awal perjalanan, kecepatan motor adalah 5 m/s. Setelah 5 detik, kecepatannya menjadi 15 m/s. Berapa percepatan motor listrik?</p>
+        <textarea id="k1_q3" placeholder="Tuliskan rumus dan langkah perhitungannya..."></textarea>
+      </div>
+
+      <div class="question-box">
+        <p>4. Jika motor bergerak dengan kecepatan rata-rata pada nomor 2 selama 30 detik, berapa jarak yang ditempuh?</p>
+        <textarea id="k1_q4" placeholder="Tuliskan perhitungan Anda..."></textarea>
+      </div>
+
+      <div class="btn-group" style="justify-content: space-between;">
+        <button class="secondary" onclick="switchTab('tab-1')">⬅ Kembali</button>
+        <button onclick="switchTab('tab-3')">Lanjut ke Studi Kasus 2 ➡</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BAGIAN 3: STUDI KASUS 2 -->
+  <div id="tab-3" class="section-page">
+    <div class="card">
+      <h2>☀️ Studi Kasus 2: Panel Surya Mengisi Baterai Motor</h2>
+      <p>Amati perubahan energi matahari menjadi energi listrik serta informasi daya pada *charge controller*.</p>
+
+      <div class="stage-2">
+        <div class="sun-2">☀️</div>
+        <div class="panel-2"></div>
+        <div class="ray r1">↘</div><div class="ray r2">↘</div><div class="ray r3">↘</div>
+        <div class="wire-2"></div>
+        <div class="controller-2">CONTROLLER<br><small>20 V | 5 A</small></div>
+        <div class="battery-2">🔋 BATERAI<div id="bt2">0% terisi</div><div class="bar-2" id="bar2"></div></div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card"><div class="info-val">20 V</div><div class="info-lab">Tegangan (V)</div></div>
+        <div class="info-card"><div class="info-val">5 A</div><div class="info-lab">Arus (I)</div></div>
+        <div class="info-card"><div class="info-val" id="p2">—</div><div class="info-lab">Daya (P)</div></div>
+        <div class="info-card"><div class="info-val" id="e2">—</div><div class="info-lab">Energi (E)</div></div>
+        <div class="info-card"><div class="info-val" id="t2">0 jam</div><div class="info-lab">Waktu (t)</div></div>
+      </div>
+
+      <div class="btn-group">
+        <button onclick="startSim2()">▶ Mulai Pengisian</button>
+        <button class="secondary" onclick="pauseSim2()">Ⅱ Jeda</button>
+        <button class="secondary" onclick="resetSim2()">↻ Ulangi</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📝 Pertanyaan Analisis Kasus 2</h2>
+
+      <div class="question-box">
+        <p>1. Panel surya menghasilkan tegangan 20 V dan arus 5 A. Berapakah daya listrik ($P$) yang dihasilkan?</p>
+        <textarea id="k2_q1" placeholder="Tuliskan rumus dan perhitungan..."></textarea>
+      </div>
+
+      <div class="question-box">
+        <p>2. Jika panel menghasilkan daya tersebut selama 3 jam, berapakah energi listrik ($E$) yang dihasilkan (Wh)?</p>
+        <textarea id="k2_q2" placeholder="Tuliskan langkah perhitungan..."></textarea>
+      </div>
+
+      <div class="question-box">
+        <p>3. Baterai membutuhkan energi sebesar 300 Wh. Jika panel menghasilkan daya konstan dari nomor 1, berapa waktu yang diperlukan untuk mengisi penuh baterai?</p>
+        <textarea id="k2_q3" placeholder="Tuliskan langkah perhitungannya..."></textarea>
+      </div>
+
+      <div class="question-box">
+        <p>4. Jika panel bekerja selama 4 jam dengan daya yang sama, berapa energi listrik total yang dihasilkan?</p>
+        <textarea id="k2_q4" placeholder="Tuliskan perhitungan..."></textarea>
+      </div>
+
+      <div class="btn-group" style="justify-content: space-between;">
+        <button class="secondary" onclick="switchTab('tab-2')">⬅ Kembali</button>
+        <button onclick="switchTab('tab-4')">Lanjut ke Studi Kasus 3 ➡</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BAGIAN 4: STUDI KASUS 3 -->
+  <div id="tab-4" class="section-page">
+    <div class="card">
+      <h2>🚗 Studi Kasus 3: Analisis Grafik Kecepatan - Waktu</h2>
+      <p>Kendaraan bergerak dari keadaan diam dengan percepatan teratur. Jalankan animasi untuk mencatat data dan memplot grafik.</p>
+
+      <div class="scene-3">
+        <div class="sun-3"></div>
+        <div class="speed-box-3">t = <span id="time3">0.0</span> s &nbsp;|&nbsp; v = <span id="speed3">0.0</span> m/s</div>
+        <div class="car-3" id="car3">
+          <div class="car-roof-3"></div>
+          <div class="car-body-3"></div>
+          <div class="wheel-3 w3-1"></div>
+          <div class="wheel-3 w3-2"></div>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button id="startBtn3" onclick="startSim3()">▶ Mulai Animasi</button>
+        <button id="pauseBtn3" class="secondary" onclick="pauseSim3()" disabled>⏸ Pause</button>
+        <button class="secondary" onclick="resetSim3()">↻ Ulangi</button>
+      </div>
+    </div>
+
+    <div class="grid-2col">
+      <div class="card">
+        <h2>📋 Data Pengamatan</h2>
+        <table>
+          <thead>
+            <tr><th>Waktu t (s)</th><th>Kecepatan v (m/s)</th></tr>
+          </thead>
+          <tbody id="dataBody3">
+            <!-- Data otomatis muncul -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2>📈 Grafik Kecepatan–Waktu</h2>
+        <canvas id="graph3" width="600" height="350"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📝 Pertanyaan Analisis Kasus 3</h2>
+
+      <div class="question-box">
+        <p>1. Tentukan percepatan ($a$) kendaraan selama 10 detik berdasarkan data/grafik!</p>
+        <textarea id="k3_q1" placeholder="Tuliskan langkah perhitungannya..."></textarea>
+      </div>
+
+      <div class="question-box">
+        <p>2. Tentukan jarak ($s$) yang ditempuh kendaraan selama 10 detik dengan rumus GLBB!</p>
+        <textarea id="k3_q2" placeholder="Tuliskan langkah perhitungannya..."></textarea>
+      </div>
+
+      <div class="question-box">
+        <p>3. Berapakah kecepatan kendaraan pada saat t = 6 s?</p>
+        <input type="text" id="k3_q3" placeholder="Tuliskan jawaban Anda...">
+      </div>
+
+      <div class="question-box">
+        <p>4. Apa arti fisik dari kemiringan (slope) pada grafik kecepatan–waktu di atas?</p>
+        <textarea id="k3_q4" placeholder="Jelaskan analisis Anda..."></textarea>
+      </div>
+
+      <div class="question-box">
+        <p>5. Tentukan jarak tempuh kendaraan dengan menghitung LUAS daerah di bawah grafik $v-t$!</p>
+        <textarea id="k3_q5" placeholder="Tuliskan cara perhitungan luas segitiga grafik..."></textarea>
+      </div>
+
+      <div class="question-box">
+        <p>6. Bandingkan hasil perhitungan nomor 2 (rumus) dengan nomor 5 (luas grafik). Apa kesimpulan Anda?</p>
+        <textarea id="k3_q6" placeholder="Tuliskan kesimpulan perbandingan..."></textarea>
+      </div>
+
+      <div class="btn-group" style="justify-content: space-between;">
+        <button class="secondary" onclick="switchTab('tab-3')">⬅ Kembali</button>
+        <button onclick="switchTab('tab-5')">Lanjut ke Refleksi & Kirim ➡</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BAGIAN 5: REFLEKSI & SUBMIT -->
+  <div id="tab-5" class="section-page">
+    <div class="card">
+      <h2>💭 Refleksi Pembelajaran Mahasiswa</h2>
+      
+      <div class="question-box">
+        <p>1. Hal baru apa yang Anda pelajari mengenai penerapan konsep Fisika (Kinematika & Energi) pada kendaraan/motor listrik?</p>
+        <textarea id="ref1" placeholder="Tuliskan refleksi Anda..."></textarea>
+      </div>
+
+      <div class="question-box">
+        <p>2. Bagian mana dari simulasi interaktif ini yang paling membantu pemahaman Anda? Jelaskan alasannya.</p>
+        <textarea id="ref2" placeholder="Tuliskan pendapat Anda..."></textarea>
+      </div>
+
+      <div style="background: #e0f2fe; border: 1px solid #bae6fd; padding: 15px; border-radius: 10px; margin-top: 20px;">
+        <p style="margin:0; font-size:13px; color:#0369a1;"><b>📌 Catatan Penting:</b> Pastikan data Identitas Mahasiswa (Nama, NPM, Kelas) serta semua jawaban Studi Kasus 1, 2, dan 3 telah terisi sebelum menekan tombol di bawah ini.</p>
+      </div>
+
+      <div class="btn-group" style="justify-content: space-between; margin-top: 20px;">
+        <button class="secondary" onclick="switchTab('tab-4')">⬅ Kembali</button>
+        <button id="submitBtn" onclick="submitLKPD()" style="background: #16a34a; font-size: 16px; padding: 12px 25px;">🚀 Kirim Semua Jawaban ke Spreadsheet</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    LKPD Digital Fisika Interaktif • Dikembangkan untuk Media Pembelajaran Konsep Motor Listrik
+  </div>
+
+</div>
+
+<script>
+/* =========================================
+   1. SISTEM NAVIGASI TAB
+========================================= */
+function switchTab(tabId) {
+  document.querySelectorAll('.section-page').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.step-tab').forEach(el => el.classList.remove('active'));
+  
+  document.getElementById(tabId).classList.add('active');
+  
+  // Highlighting tab button
+  const tabs = ['tab-0', 'tab-1', 'tab-2', 'tab-3', 'tab-4', 'tab-5'];
+  const index = tabs.indexOf(tabId);
+  if(index !== -1) {
+    document.querySelectorAll('.step-tab')[index].classList.add('active');
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* =========================================
+   2. LOGIKA SIMULASI KASUS 1 (MOTOR)
+========================================= */
+let t1 = 0, running1 = false, last1 = 0, frame1;
+const motor1 = document.getElementById("motor1");
+const dist1 = document.getElementById("dist1");
+const time1 = document.getElementById("time1");
+
+function drawSim1() {
+  const p = Math.min(t1 / 20, 1);
+  motor1.style.left = (2 + p * 88) + "%";
+  dist1.textContent = Math.round(p * 300) + " m";
+  time1.textContent = Math.round(p * 20) + " s";
+}
+function animSim1(now) {
+  if (!running1) return;
+  if (!last1) last1 = now;
+  t1 += (now - last1) / 1000;
+  last1 = now;
+  if (t1 >= 20) { t1 = 20; running1 = false; }
+  drawSim1();
+  if (running1) frame1 = requestAnimationFrame(animSim1);
+}
+function startSim1() {
+  if (t1 >= 20) t1 = 0;
+  running1 = true; last1 = 0;
+  cancelAnimationFrame(frame1);
+  frame1 = requestAnimationFrame(animSim1);
+}
+function pauseSim1() { running1 = false; last1 = 0; cancelAnimationFrame(frame1); }
+function resetSim1() { running1 = false; last1 = 0; t1 = 0; cancelAnimationFrame(frame1); drawSim1(); }
+
+/* =========================================
+   3. LOGIKA SIMULASI KASUS 2 (PANEL SURYA)
+========================================= */
+let q2 = 0, on2 = 0, last2 = 0, id2;
+const p2 = document.getElementById('p2'), e2 = document.getElementById('e2'), t2 = document.getElementById('t2');
+const bar2 = document.getElementById('bar2'), bt2 = document.getElementById('bt2');
+
+function drawSim2() {
+  let P = 100, h = Math.min(q2 / 10 * 4, 4), E = P * h;
+  p2.textContent = P + ' W';
+  e2.textContent = Math.round(E) + ' Wh';
+  t2.textContent = h.toFixed(1) + ' jam';
+  let z = Math.min(E / 300 * 100, 100);
+  bar2.style.width = z + '%';
+  bt2.textContent = Math.round(z) + '% terisi';
+}
+function animSim2(n) {
+  if (!on2) return;
+  if (!last2) last2 = n;
+  q2 += (n - last2) / 1000;
+  last2 = n;
+  if (q2 >= 10) { q2 = 10; on2 = 0; }
+  drawSim2();
+  if (on2) id2 = requestAnimationFrame(animSim2);
+}
+function startSim2() {
+  if (q2 >= 10) q2 = 0;
+  on2 = 1; last2 = 0;
+  id2 = requestAnimationFrame(animSim2);
+}
+function pauseSim2() { on2 = 0; last2 = 0; cancelAnimationFrame(id2); }
+function resetSim2() { on2 = 0; last2 = 0; q2 = 0; cancelAnimationFrame(id2); drawSim2(); }
+
+/* =========================================
+   4. LOGIKA SIMULASI KASUS 3 (GRAFIK & CANVAS)
+========================================= */
+const times3 = [0, 2, 4, 6, 8, 10];
+const speeds3 = [0, 3, 6, 9, 12, 15];
+let running3 = false, elapsed3 = 0, timer3 = null;
+
+const timeElement3 = document.getElementById("time3");
+const speedElement3 = document.getElementById("speed3");
+const car3 = document.getElementById("car3");
+const startBtn3 = document.getElementById("startBtn3");
+const pauseBtn3 = document.getElementById("pauseBtn3");
+const dataBody3 = document.getElementById("dataBody3");
+const canvas3 = document.getElementById("graph3");
+const ctx3 = canvas3.getContext("2d");
+
+function getSpeed3(t) { return t <= 0 ? 0 : (t >= 10 ? 15 : 1.5 * t); }
+
+function drawGraph3(currentTime) {
+  const W = canvas3.width, H = canvas3.height;
+  const left = 50, right = 20, top = 20, bottom = 40;
+  const graphW = W - left - right, graphH = H - top - bottom;
+
+  ctx3.clearRect(0, 0, W, H);
+
+  // Grid
+  ctx3.strokeStyle = "#e2e8f0"; ctx3.lineWidth = 1;
+  for (let t = 0; t <= 10; t += 2) {
+    const x = left + (t / 10) * graphW;
+    ctx3.beginPath(); ctx3.moveTo(x, top); ctx3.lineTo(x, H - bottom); ctx3.stroke();
+  }
+  for (let v = 0; v <= 15; v += 3) {
+    const y = H - bottom - (v / 15) * graphH;
+    ctx3.beginPath(); ctx3.moveTo(left, y); ctx3.lineTo(W - right, y); ctx3.stroke();
+  }
+
+  // Axes
+  ctx3.strokeStyle = "#1e3a8a"; ctx3.lineWidth = 2;
+  ctx3.beginPath(); ctx3.moveTo(left, top); ctx3.lineTo(left, H - bottom); ctx3.lineTo(W - right, H - bottom); ctx3.stroke();
+
+  // Labels
+  ctx3.fillStyle = "#334155"; ctx3.font = "12px Arial"; ctx3.textAlign = "center";
+  for (let t = 0; t <= 10; t += 2) ctx3.fillText(t, left + (t / 10) * graphW, H - bottom + 18);
+  ctx3.textAlign = "right";
+  for (let v = 0; v <= 15; v += 3) ctx3.fillText(v, left - 8, H - bottom - (v / 15) * graphH + 4);
+
+  // Plot Line
+  const end = Math.min(currentTime, 10);
+  ctx3.strokeStyle = "#e67e22"; ctx3.lineWidth = 3;
+  ctx3.beginPath();
+  for (let i = 0; i <= 100; i++) {
+    const t = end * i / 100, v = getSpeed3(t);
+    const x = left + (t / 10) * graphW, y = H - bottom - (v / 15) * graphH;
+    if (i === 0) ctx3.moveTo(x, y); else ctx3.lineTo(x, y);
+  }
+  ctx3.stroke();
+}
+
+function updateTable3(currentTime) {
+  dataBody3.innerHTML = "";
+  for (let i = 0; i < times3.length; i++) {
+    if (times3[i] <= currentTime) {
+      const row = document.createElement("tr");
+      row.innerHTML = `<td>${times3[i]}</td><td>${speeds3[i]}</td>`;
+      dataBody3.appendChild(row);
+    }
+  }
+}
+
+function update3() {
+  elapsed3 += 0.1;
+  if (elapsed3 >= 10) { elapsed3 = 10; pauseSim3(); }
+  const speed = getSpeed3(elapsed3);
+  timeElement3.textContent = elapsed3.toFixed(1);
+  speedElement3.textContent = speed.toFixed(1);
+  car3.style.left = (5 + (elapsed3 / 10) * 80) + "%";
+  drawGraph3(elapsed3);
+  updateTable3(elapsed3);
+}
+
+function startSim3() {
+  if (running3) return;
+  running3 = true; startBtn3.disabled = true; pauseBtn3.disabled = false;
+  timer3 = setInterval(update3, 50);
+}
+
+function pauseSim3() {
+  running3 = false; clearInterval(timer3);
+  startBtn3.disabled = false; pauseBtn3.disabled = true;
+}
+
+function resetSim3() {
+  pauseSim3(); elapsed3 = 0;
+  timeElement3.textContent = "0.0"; speedElement3.textContent = "0.0";
+  car3.style.left = "5%"; dataBody3.innerHTML = "";
+  drawGraph3(0);
+}
+
+/* =========================================
+   5. PENGIRIMAN DATA KE GOOGLE SPREADSHEET
+========================================= */
+function submitLKPD() {
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbwFgV9GELlOzP5lNt5FlLMczZ11bPvt4DvoHMuhSUXpuM5u-jfO0awKDDofbj8bs1PG/exec';
+  
+  const nama = document.getElementById('nama').value.trim();
+  const npm = document.getElementById('npm').value.trim();
+  const kelas = document.getElementById('kelas').value.trim();
+
+  if (!nama || !npm || !kelas) {
+    alert('⚠️ Harap isi Identitas Mahasiswa (Nama, NPM, dan Kelas) terlebih dahulu!');
+    switchTab('tab-0');
+    return;
+  }
+
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = '⏳ Mengirim Jawaban...';
+
+  const payload = {
+    nama: nama,
+    npm: npm,
+    kelas: kelas,
+    
+    // Studi Kasus 1
+    k1_q1: document.getElementById('k1_q1').value,
+    k1_q2: document.getElementById('k1_q2').value,
+    k1_q3: document.getElementById('k1_q3').value,
+    k1_q4: document.getElementById('k1_q4').value,
+    
+    // Studi Kasus 2
+    k2_q1: document.getElementById('k2_q1').value,
+    k2_q2: document.getElementById('k2_q2').value,
+    k2_q3: document.getElementById('k2_q3').value,
+    k2_q4: document.getElementById('k2_q4').value,
+    
+    // Studi Kasus 3
+    k3_q1: document.getElementById('k3_q1').value,
+    k3_q2: document.getElementById('k3_q2').value,
+    k3_q3: document.getElementById('k3_q3').value,
+    k3_q4: document.getElementById('k3_q4').value,
+    k3_q5: document.getElementById('k3_q5').value,
+    k3_q6: document.getElementById('k3_q6').value,
+    
+    // Refleksi
+    ref1: document.getElementById('ref1').value,
+    ref2: document.getElementById('ref2').value
+  };
+
+  fetch(scriptURL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(() => {
+    alert('🎉 Berhasil! Seluruh jawaban LKPD kamu telah terkirim ke Google Spreadsheet.');
+    submitBtn.textContent = '✅ Jawaban Terkirim';
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('❌ Gagal mengirim jawaban. Pastikan koneksi internet kamu stabil.');
+    submitBtn.disabled = false;
+    submitBtn.textContent = '🚀 Kirim Semua Jawaban ke Spreadsheet';
+  });
+}
+
+// Inisialisasi awal
+drawSim1();
+drawSim2();
+drawGraph3(0);
+</script>
+</body>
+</html>
