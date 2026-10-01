@@ -1,14 +1,9 @@
 <!DOCTYPE html>
-
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LKPD Digital Interaktif - Kinematika & Energi Motor Listrik</title>
-<!-- KaTeX for Math Rendering -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex-auto-render.min.js" onload="renderMathInElement(document.body);"></script>
 
 <style>
 * { box-sizing: border-box; }
@@ -55,6 +50,11 @@ textarea { min-height: 90px; resize: vertical; }
 .wheel { position: absolute; bottom:0; width:20px; height:20px; border:3px solid #1d2329; border-radius:50%; background:#cbd0d6; }
 .w1{left:8px}.w2{right:7px}
 .body-m { position: absolute; left:25px; bottom:25px; width:32px; height:13px; background:#344d60; border-radius:10px 15px 4px 6px; }
+
+/* ANIMASI CANVAS INTERAKTIF LIMIT (SOAL 4) */
+.limit-anim-box { background: #0f172a; border-radius: 12px; padding: 15px; margin: 15px 0; color: white; text-align: center; }
+.limit-canvas { width: 100%; max-width: 650px; height: 220px; background: #1e293b; border-radius: 8px; margin: 10px auto; display: block; }
+.limit-controls { display: flex; justify-content: center; align-items: center; gap: 15px; flex-wrap: wrap; margin-top: 10px; }
 
 /* SIMULASI 2 - PANEL SURYA */
 .stage-2 { height: 220px; position: relative; background: linear-gradient(#dff2ff 0 100%); border-radius: 16px; overflow: hidden; border: 1px solid #cbd5e1; }
@@ -104,25 +104,22 @@ canvas { width: 100%; height: 260px; border: 1px solid #cbd5e1; border-radius: 1
 .question-box { background: #f8fafc; border-left: 4px solid #2563eb; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
 .question-box p { margin: 0 0 8px 0; font-weight: 600; }
 
-.formula-card { background: #f1f5f9; padding: 12px 15px; border-radius: 8px; font-family: 'Courier New', Courier, monospace; font-weight: bold; color: #1e3a8a; margin: 8px 0; border-left: 3px solid #2563eb; }
+.math-eq { font-family: 'Georgia', serif; font-style: italic; background: #e0f2fe; padding: 8px 14px; border-radius: 6px; display: inline-block; margin: 4px 0; font-size: 15px; }
 
 .footer { text-align: center; font-size: 12px; color: #94a3b8; margin-top: 30px; padding: 15px; }
 </style>
-
 </head>
 <body>
 
 <div class="container">
-
+  
   <!-- HEADER UTAMA -->
-
   <div class="main-header">
     <h1>⚡ LKPD Interaktif Kinematika & Energi</h1>
-    <p>Lembar Kerja Peserta Didik Digital - Analisis Jarak, Kecepatan, Percepatan, dan Panel Surya Motor Listrik</p>
+    <p>Lembar Kerja Peserta Didik Digital - Integrasi Animasi & Analisis Data Motor Listrik</p>
   </div>
 
   <!-- TAB NAVIGASI -->
-
   <div class="nav-steps">
     <div class="step-tab active" onclick="switchTab('tab-0')">1. Petunjuk</div>
     <div class="step-tab" onclick="switchTab('tab-1')">2. Materi</div>
@@ -133,7 +130,6 @@ canvas { width: 100%; height: 260px; border: 1px solid #cbd5e1; border-radius: 1
   </div>
 
   <!-- BAGIAN 0: IDENTITAS & PETUNJUK -->
-
   <div id="tab-0" class="section-page active">
     <div class="card">
       <h2>👤 Identitas Mahasiswa</h2>
@@ -153,322 +149,350 @@ canvas { width: 100%; height: 260px; border: 1px solid #cbd5e1; border-radius: 1
       </div>
     </div>
 
-<div class="card">
-  <h2>🎯 Tujuan Pembelajaran & Langkah Kerja</h2>
-  <h3>Tujuan Pembelajaran:</h3>
-  <ul>
-    <li>Menganalisis konsep <b>Jarak (s)</b>, <b>Kecepatan (v)</b>, dan <b>Percepatan (a)</b> pada gerak motor listrik.</li>
-    <li>Menghitung besaran daya dan energi listrik hasil konversi panel surya untuk pengisian baterai kendaraan.</li>
-    <li>Menganalisis serta menginterpretasikan <b>Grafik Kecepatan terhadap Waktu (v - t)</b> pada gerak percepatan teratur.</li>
-  </ul>
-  
-  <h3>Langkah-Langkah Pengerjaan:</h3>
-  <ol>
-    <li>Isi data identitas diri di atas dengan benar.</li>
-    <li>Pelajari ringkasan materi pada Tab 2.</li>
-    <li>Amati animasi interaktif pada Studi Kasus 1, 2, dan 3 secara berurutan.</li>
-    <li>Jawablah pertanyaan-pertanyaan analisis yang disediakan di bawah setiap simulasi.</li>
-    <li>Isi bagian refleksi pada Tab 6, lalu klik tombol <b>"🚀 Kirim Semua Jawaban"</b> untuk menyimpan data ke Spreadsheet dosen.</li>
-  </ol>
-  
-  <div style="text-align: right; margin-top: 15px;">
-    <button onclick="switchTab('tab-1')">Lanjut ke Ringkasan Materi ➡</button>
-  </div>
-</div>
-
-  </div>
-
-  <!-- BAGIAN 1: RINGKASAN MATERI -->
-
-  <div id="tab-1" class="section-page">
     <div class="card">
-      <h2>📚 Ringkasan Materi: Jarak, Kecepatan, Percepatan & Panel Surya</h2>
-
-  <h3>1. Jarak, Kecepatan, dan Percepatan Motor Listrik</h3>
-  <p>Dalam analisis gerak motor listrik, terdapat tiga besaran utama:</p>
-  <ul>
-    <li><b>Jarak (s):</b> Panjang lintasan total yang ditempuh oleh motor listrik (satuan: meter / m).</li>
-    <li><b>Kecepatan (v):</b> Perubahan jarak terhadap waktu. Pada Gerak Lurus Beraturan (GLB):
-      <div class="formula-card">v = s / t</div>
-    </li>
-    <li><b>Percepatan (a):</b> Perubahan kecepatan motor listrik dalam tiap satuan waktu (GLBB):
-      <div class="formula-card">a = (v<sub>t</sub> - v<sub>0</sub>) / t</div>
-      <div class="formula-card">s = v<sub>0</sub> · t + ½ · a · t²</div>
-    </li>
-  </ul>
-
-  <h3>2. Energi Listrik Panel Surya Motor Listrik</h3>
-  <p>Panel surya menyerap energi matahari dan mengubahnya menjadi energi listrik untuk mengisi baterai motor:</p>
-  <ul>
-    <li><b>Daya Listrik (P):</b> Dihasilkan dari tegangan (V) dan arus listrik (I):
-      <div class="formula-card">P = V × I &nbsp;&nbsp;(Watt)</div>
-    </li>
-    <li><b>Energi Listrik (E):</b> Total daya yang dikonsumsi/dihasilkan dalam kurun waktu (t):
-      <div class="formula-card">E = P × t &nbsp;&nbsp;(Wh atau kWh)</div>
-    </li>
-  </ul>
-
-  <h3>3. Analisis Grafik Kecepatan - Waktu (v - t)</h3>
-  <p>Bila data gerak motor listrik diplot ke dalam grafik Kecepatan (v) terhadap Waktu (t):</p>
-  <ul>
-    <li><b>Kemiringan (Gradien/Slope):</b> Menunjukkan nilai <b>Percepatan (a)</b> kendaraan. Semakin curam grafik, semakin besar percepatannya.</li>
-    <li><b>Luas Daerah di Bawah Grafik:</b> Menyatakan <b>Jarak Tempuh Total (s)</b> kendaraan. Untuk grafik berbentuk segitiga, Luas = ½ × alas × tinggi.</li>
-  </ul>
-
-  <div class="btn-group" style="justify-content: space-between; margin-top: 20px;">
-    <button class="secondary" onclick="switchTab('tab-0')">⬅ Kembali</button>
-    <button onclick="switchTab('tab-2')">Masuk Studi Kasus 1 ➡</button>
-  </div>
-</div>
-
-  </div>
-
-  <!-- BAGIAN 2: STUDI KASUS 1 -->
-
-  <div id="tab-2" class="section-page">
-    <div class="card">
-      <h2>⚡ Studi Kasus 1: Perjalanan Motor Listrik (Jarak, Kecepatan, Percepatan)</h2>
-      <p>Amati perjalanan motor listrik dari titik A menuju titik D. Perhatikan perubahan jarak dan waktu yang dibutuhkan.</p>
-
-  <div class="scene-1">
-    <div class="sky-1">
-      <div class="cloud c1"></div>
-      <div class="cloud c2"></div>
-      <div class="road-1">
-        <div class="roadline-1"></div>
-        <div class="mark a">A — 0 m</div>
-        <div class="mark b">B — 100 m</div>
-        <div class="mark c">C — 200 m</div>
-        <div class="mark d">D — 300 m</div>
-        <div id="motor1" class="motor">
-          <div class="wheel w1"></div>
-          <div class="wheel w2"></div>
-          <div class="body-m"></div>
-        </div>
+      <h2>🎯 Tujuan Pembelajaran & Langkah Kerja</h2>
+      <h3>Tujuan Pembelajaran:</h3>
+      <ul>
+        <li>Menganalisis hubungan antara jarak, waktu, kecepatan, dan percepatan pada gerak kendaraan listrik.</li>
+        <li>Menghitung konversi energi matahari menjadi energi listrik dan estimasi waktu pengisian baterai.</li>
+        <li>Menganalisis dan menginterpretasikan grafik Kecepatan–Waktu (v - t) dari data pengamatan simulasi.</li>
+        <li>Menerapkan konsep limit fungsi matematika untuk menentukan kecepatan sesaat kendaraan listrik.</li>
+      </ul>
+      
+      <h3>Langkah-Langkah Pengerjaan:</h3>
+      <ol>
+        <li>Isi data identitas diri di atas dengan benar.</li>
+        <li>Pelajari ringkasan materi ringkas pada Tab 2.</li>
+        <li>Amati animasi interaktif pada Studi Kasus 1, 2, dan 3 secara berurutan.</li>
+        <li>Jawablah pertanyaan-pertanyaan analisis yang disediakan di bawah setiap simulasi.</li>
+        <li>Isi bagian refleksi pada Tab 6, lalu klik tombol <b>"🚀 Kirim Semua Jawaban"</b> untuk menyimpan data ke Spreadsheet dosen.</li>
+      </ol>
+      
+      <div style="text-align: right; margin-top: 15px;">
+        <button onclick="switchTab('tab-1')">Lanjut ke Ringkasan Materi ➡</button>
       </div>
     </div>
   </div>
 
-  <div class="info-grid">
-    <div class="info-card"><div id="dist1" class="info-val">0 m</div><div class="info-lab">Jarak Tempuh (s)</div></div>
-    <div class="info-card"><div id="time1" class="info-val">0 s</div><div class="info-lab">Waktu (t)</div></div>
-  </div>
-
-  <div class="btn-group">
-    <button onclick="startSim1()">▶ Mulai Animasi</button>
-    <button class="secondary" onclick="pauseSim1()">Ⅱ Jeda</button>
-    <button class="secondary" onclick="resetSim1()">↻ Ulangi</button>
-  </div>
-</div>
-
-<div class="card">
-  <h2>📝 Pertanyaan Analisis Kasus 1</h2>
-  
-  <div class="question-box">
-    <p>1. Berapa jarak total (s) yang ditempuh motor listrik dari titik A sampai titik D?</p>
-    <input type="text" id="k1_q1" placeholder="Tuliskan jawaban Anda...">
-  </div>
-
-  <div class="question-box">
-    <p>2. Motor menempuh jarak tersebut dalam waktu t = 20 detik. Berapa kecepatan rata-rata (v) motor listrik tersebut?</p>
-    <textarea id="k1_q2" placeholder="Tuliskan rumus dan langkah perhitungannya..."></textarea>
-  </div>
-
-  <div class="question-box">
-    <p>3. Pada awal perjalanan, kecepatan motor v₀ = 5 m/s. Setelah 5 detik, kecepatannya menjadi v<sub>t</sub> = 15 m/s. Hitunglah percepatan (a) motor listrik tersebut!</p>
-    <textarea id="k1_q3" placeholder="Tuliskan rumus dan langkah perhitungannya..."></textarea>
-  </div>
-
-  <div class="question-box">
-    <p>4. Jika motor bergerak konstan dengan kecepatan rata-rata pada nomor 2 selama t = 30 detik, berapakah jarak tempuh totalnya?</p>
-    <textarea id="k1_q4" placeholder="Tuliskan perhitungan Anda..."></textarea>
-  </div>
-
-  <div class="btn-group" style="justify-content: space-between;">
-    <button class="secondary" onclick="switchTab('tab-1')">⬅ Kembali</button>
-    <button onclick="switchTab('tab-3')">Lanjut ke Studi Kasus 2 ➡</button>
-  </div>
-</div>
-
-  </div>
-
-  <!-- BAGIAN 3: STUDI KASUS 2 -->
-
-  <div id="tab-3" class="section-page">
+  <!-- BAGIAN 1: RINGKASAN MATERI -->
+  <div id="tab-1" class="section-page">
     <div class="card">
-      <h2>☀️ Studi Kasus 2: Panel Surya Mengisi Baterai Motor Listrik</h2>
-      <p>Amati konversi energi radiasi matahari menjadi daya dan energi listrik untuk mengisi daya baterai motor.</p>
+      <h2>📚 Ringkasan Materi Fisika & Implementasinya</h2>
+      
+      <h3>1. Konsep Dasar Kinematika Gerak Lurus</h3>
+      <p>Kinematika mempelajari gerak benda tanpa meninjau penyebabnya. Terdapat tiga besaran utama:</p>
+      <ul>
+        <li><b>Jarak / Perpindahan (s):</b> Panjang lintasan yang ditempuh oleh kendaraan (dalam meter/m atau kilometer/km).</li>
+        <li><b>Kecepatan (v):</b> Perubahan jarak terhadap waktu tempuh (<b>v = s / t</b>, dalam m/s atau km/jam). Pada Gerak Lurus Beraturan (GLB), kecepatan bernilai konstan.</li>
+        <li><b>Percepatan (a):</b> Perubahan kecepatan tiap satuan waktu (<b>a = Δv / Δt = (v_t - v_0) / t</b>, dalam m/s²). Jika nilai a &gt; 0, benda dipercepat; jika a &lt; 0, benda diperlambat.</li>
+      </ul>
 
-  <div class="stage-2">
-    <div class="sun-2">☀️</div>
-    <div class="panel-2"></div>
-    <div class="ray r1">↘</div><div class="ray r2">↘</div><div class="ray r3">↘</div>
-    <div class="wire-2"></div>
-    <div class="controller-2">CONTROLLER<br><small>20 V | 5 A</small></div>
-    <div class="battery-2">🔋 BATERAI<div id="bt2">0% terisi</div><div class="bar-2" id="bar2"></div></div>
-  </div>
+      <h3>2. Kecepatan Sesaat dan Konsep Limit</h3>
+      <p>Kecepatan sesaat adalah kecepatan benda pada suatu titik waktu tertentu t. Dalam kalkulus/matematika MIPA, kecepatan sesaat didefinisikan sebagai limit dari kecepatan rata-rata ketika selang waktu Δt mendekati nol:</p>
+      <div style="text-align: center;">
+        <span class="math-eq">v(t) = Lim (Δt → 0) [ s(t + Δt) - s(t) ] / Δt</span>
+      </div>
 
-  <div class="info-grid">
-    <div class="info-card"><div class="info-val">20 V</div><div class="info-lab">Tegangan (V)</div></div>
-    <div class="info-card"><div class="info-val">5 A</div><div class="info-lab">Arus (I)</div></div>
-    <div class="info-card"><div class="info-val" id="p2">—</div><div class="info-lab">Daya Listrik (P)</div></div>
-    <div class="info-card"><div class="info-val" id="e2">—</div><div class="info-lab">Energi Listrik (E)</div></div>
-    <div class="info-card"><div class="info-val" id="t2">0 jam</div><div class="info-lab">Waktu (t)</div></div>
-  </div>
+      <h3>3. Implementasi pada Motor Listrik & Panel Surya</h3>
+      <ul>
+        <li><b>Pengisian Baterai Motor Listrik (Panel Surya):</b> Panel surya mengonversi energi cahaya matahari menjadi energi listrik (<b>P = V × I</b>). Energi listrik yang tersimpan (<b>E = P × t</b>) kemudian memberi suplai daya ke motor listrik agar dapat bergerak.</li>
+        <li><b>Gerak Motor Listrik:</b> Saat pengemudi memutar gas (<i>throttle</i>), controller mengatur arus dari baterai ke motor. Peningkatan kecepatan secara bertahap menghasilkan <b>percepatan (a)</b>, sehingga motor mengalami Gerak Lurus Berubah Beraturan (GLBB).</li>
+      </ul>
 
-  <div class="btn-group">
-    <button onclick="startSim2()">▶ Mulai Pengisian</button>
-    <button class="secondary" onclick="pauseSim2()">Ⅱ Jeda</button>
-    <button class="secondary" onclick="resetSim2()">↻ Ulangi</button>
-  </div>
-</div>
+      <h3>4. Analisis Grafik Kecepatan terhadap Waktu (v - t)</h3>
+      <p>Grafik v - t memberikan dua informasi fisis penting terkait gerak kendaraan:</p>
+      <ul>
+        <li><b>Kemiringan (Gradien/Slope) Garis:</b> Menyatakan besarnya <b>Percepatan (a)</b> kendaraan. Semakin curam garis, semakin besar percepatannya.
+          <br><span class="math-eq">a = Slope = (v_t - v_0) / t</span>
+        </li>
+        <li><b>Luas Daerah di Bawah Grafik:</b> Menyatakan <b>Jarak Total (s)</b> yang ditempuh oleh kendaraan selama rentang waktu t.
+          <br><span class="math-eq">Jarak (s) = Luas Bangun di Bawah Grafik v - t</span>
+        </li>
+      </ul>
 
-<div class="card">
-  <h2>📝 Pertanyaan Analisis Kasus 2</h2>
-
-  <div class="question-box">
-    <p>1. Panel surya menghasilkan tegangan V = 20 V dan arus I = 5 A. Berapakah daya listrik (P) yang dihasilkan panel surya?</p>
-    <textarea id="k2_q1" placeholder="Tuliskan rumus dan perhitungan..."></textarea>
-  </div>
-
-  <div class="question-box">
-    <p>2. Jika panel surya menghasilkan daya tersebut selama t = 3 jam, berapakah energi listrik (E) yang dihasilkan dalam satuan Wh?</p>
-    <textarea id="k2_q2" placeholder="Tuliskan langkah perhitungan..."></textarea>
-  </div>
-
-  <div class="question-box">
-    <p>3. Baterai motor listrik membutuhkan energi sebesar 300 Wh untuk terisi penuh. Dengan daya konstan nomor 1, berapa jam waktu yang dibutuhkan sampai baterai penuh?</p>
-    <textarea id="k2_q3" placeholder="Tuliskan langkah perhitungannya..."></textarea>
-  </div>
-
-  <div class="question-box">
-    <p>4. Apabila panel surya disinari matahari selama t = 4 jam dengan daya konstan, berapa energi total yang tersimpan di baterai?</p>
-    <textarea id="k2_q4" placeholder="Tuliskan perhitungan..."></textarea>
-  </div>
-
-  <div class="btn-group" style="justify-content: space-between;">
-    <button class="secondary" onclick="switchTab('tab-2')">⬅ Kembali</button>
-    <button onclick="switchTab('tab-4')">Lanjut ke Studi Kasus 3 ➡</button>
-  </div>
-</div>
-
-  </div>
-
-  <!-- BAGIAN 4: STUDI KASUS 3 -->
-
-  <div id="tab-4" class="section-page">
-    <div class="card">
-      <h2>🚗 Studi Kasus 3: Analisis Grafik Kecepatan - Waktu (v - t)</h2>
-      <p>Kendaraan listrik bergerak dari keadaan diam dengan percepatan teratur. Jalankan animasi untuk mencatat data dan memplot grafik v - t secara real-time.</p>
-
-  <div class="scene-3">
-    <div class="sun-3"></div>
-    <div class="speed-box-3">t = <span id="time3">0.0</span> s &nbsp;|&nbsp; v = <span id="speed3">0.0</span> m/s</div>
-    <div class="car-3" id="car3">
-      <div class="car-roof-3"></div>
-      <div class="car-body-3"></div>
-      <div class="wheel-3 w3-1"></div>
-      <div class="wheel-3 w3-2"></div>
+      <div class="btn-group" style="justify-content: space-between; margin-top: 25px;">
+        <button class="secondary" onclick="switchTab('tab-0')">⬅ Kembali</button>
+        <button onclick="switchTab('tab-2')">Masuk Studi Kasus 1 ➡</button>
+      </div>
     </div>
   </div>
 
-  <div class="btn-group">
-    <button id="startBtn3" onclick="startSim3()">▶ Mulai Animasi</button>
-    <button id="pauseBtn3" class="secondary" onclick="pauseSim3()" disabled>⏸ Pause</button>
-    <button class="secondary" onclick="resetSim3()">↻ Ulangi</button>
+  <!-- BAGIAN 2: STUDI KASUS 1 -->
+  <div id="tab-2" class="section-page">
+    <div class="card">
+      <h2>⚡ Studi Kasus 1: Perjalanan Motor Listrik</h2>
+      <p>Amati perjalanan motor listrik dari titik A menuju titik D. Perhatikan perubahan jarak dan waktu.</p>
+      
+      <div class="scene-1">
+        <div class="sky-1">
+          <div class="cloud c1"></div>
+          <div class="cloud c2"></div>
+          <div class="road-1">
+            <div class="roadline-1"></div>
+            <div class="mark a">A — 0 m</div>
+            <div class="mark b">B — 100 m</div>
+            <div class="mark c">C — 200 m</div>
+            <div class="mark d">D — 300 m</div>
+            <div id="motor1" class="motor">
+              <div class="wheel w1"></div>
+              <div class="wheel w2"></div>
+              <div class="body-m"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card"><div id="dist1" class="info-val">0 m</div><div class="info-lab">Jarak Tempuh</div></div>
+        <div class="info-card"><div id="time1" class="info-val">0 s</div><div class="info-lab">Waktu (t)</div></div>
+      </div>
+
+      <div class="btn-group">
+        <button onclick="startSim1()">▶ Mulai Animasi</button>
+        <button class="secondary" onclick="pauseSim1()">Ⅱ Jeda</button>
+        <button class="secondary" onclick="resetSim1()">↻ Ulangi</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📝 Pertanyaan Analisis Kasus 1</h2>
+      
+      <div class="question-box">
+        <p>1. Berapa jarak total yang ditempuh motor listrik dari titik A sampai titik D?</p>
+        <input type="text" id="k1_q1" placeholder="Tuliskan jawaban Anda...">
+      </div>
+
+      <div class="question-box">
+        <p>2. Motor menempuh jarak tersebut dalam waktu 20 detik. Berapa kecepatan rata-rata motor listrik?</p>
+        <textarea id="k1_q2" placeholder="Tuliskan langkah perhitungan dan jawaban akhir..."></textarea>
+      </div>
+
+      <div class="question-box">
+        <p>3. Pada awal perjalanan, kecepatan motor adalah 5 m/s. Setelah 5 detik, kecepatannya menjadi 15 m/s. Berapa percepatan motor listrik?</p>
+        <textarea id="k1_q3" placeholder="Tuliskan rumus dan langkah perhitungannya..."></textarea>
+      </div>
+
+      <!-- SOAL 4: LIMIT KECEPATAN SESAAT MOTOR LISTRIK & ANIMASI CANVAS -->
+      <div class="question-box" style="border-left-color: #0284c7; background: #f0f9ff;">
+        <p>4. Kecepatan Sesaat Motor Listrik menggunakan Limit Fungsi</p>
+        <p style="font-weight: normal; margin-top: 5px;">
+          Sebuah motor listrik bergerak pada lintasan lurus. Posisi motor terhadap waktu dinyatakan oleh fungsi:
+        </p>
+        <div style="text-align: center;">
+          <span class="math-eq">s(t) = t² + 2t</span>
+        </div>
+        <p style="font-weight: normal;">
+          dengan <b>s</b> dalam meter dan <b>t</b> dalam sekon. Pada saat <b>t = 3 s</b>, teknisi ingin mengetahui kecepatan sesaat motor. Kecepatan sesaat dapat ditentukan menggunakan konsep limit:
+        </p>
+        <div style="text-align: center;">
+          <span class="math-eq">v(t) = Lim (Δt → 0) [ s(t + Δt) - s(t) ] / Δt</span>
+        </div>
+
+        <!-- ANIMASI INTERAKTIF SENSOR LIMIT MANDIRI -->
+        <div class="limit-anim-box">
+          <h4 style="margin: 0 0 5px 0; color: #38bdf8;">🎬 Animasi Konsep Limit Kecepatan Sesaat (s(t) = t² + 2t)</h4>
+          <p style="font-size: 12px; margin-0; color: #cbd5e1;">Geser slider Δt mendekati 0 untuk melihat garis sekan berubah menjadi garis singgung (kecepatan sesaat t = 3s):</p>
+          
+          <canvas id="limitCanvas" class="limit-canvas" width="600" height="220"></canvas>
+          
+          <div class="limit-controls">
+            <label for="dtSlider" style="color: #4ade80; margin: 0;">Nilai Δt: <span id="dtVal">2.0</span> s</label>
+            <input type="range" id="dtSlider" min="0.01" max="2.0" step="0.01" value="2.0" oninput="drawLimitAnim()" style="width: 200px;">
+            <span style="font-size: 13px; font-weight: bold; color: #facc15;">v_rata-rata = <span id="vRataVal">8.00</span> m/s</span>
+          </div>
+        </div>
+
+        <p style="margin-top: 15px;"><b>Tugas Mahasiswa:</b></p>
+        <label for="k1_q4_a" style="font-weight: normal;">a) Tentukan persamaan umum kecepatan sesaat v(t) dengan menggunakan rumus limit di atas secara runut!</label>
+        <textarea id="k1_q4_a" placeholder="Tuliskan langkah-langkah jabaran limit Anda..."></textarea>
+
+        <label for="k1_q4_b" style="font-weight: normal; margin-top: 10px; display: block;">b) Hitunglah besar kecepatan sesaat motor listrik tersebut tepat pada saat t = 3 s!</label>
+        <input type="text" id="k1_q4_b" placeholder="Masukkan hasil akhir (contoh: ... m/s)">
+      </div>
+
+      <div class="question-box">
+        <p>5. Jika motor bergerak dengan kecepatan rata-rata pada nomor 2 selama 30 detik, berapa jarak yang ditempuh?</p>
+        <textarea id="k1_q5" placeholder="Tuliskan perhitungan Anda..."></textarea>
+      </div>
+
+      <div class="btn-group" style="justify-content: space-between;">
+        <button class="secondary" onclick="switchTab('tab-1')">⬅ Kembali</button>
+        <button onclick="switchTab('tab-3')">Lanjut ke Studi Kasus 2 ➡</button>
+      </div>
+    </div>
   </div>
-</div>
 
-<div class="grid-2col">
-  <div class="card">
-    <h2>📋 Data Pengamatan</h2>
-    <table>
-      <thead>
-        <tr><th>Waktu t (s)</th><th>Kecepatan v (m/s)</th></tr>
-      </thead>
-      <tbody id="dataBody3">
-        <!-- Data otomatis muncul -->
-      </tbody>
-    </table>
+  <!-- BAGIAN 3: STUDI KASUS 2 -->
+  <div id="tab-3" class="section-page">
+    <div class="card">
+      <h2>☀️ Studi Kasus 2: Panel Surya Mengisi Baterai Motor</h2>
+      <p>Amati perubahan energi matahari menjadi energi listrik serta informasi daya pada <i>charge controller</i>.</p>
+
+      <div class="stage-2">
+        <div class="sun-2">☀️</div>
+        <div class="panel-2"></div>
+        <div class="ray r1">↘</div><div class="ray r2">↘</div><div class="ray r3">↘</div>
+        <div class="wire-2"></div>
+        <div class="controller-2">CONTROLLER<br><small>20 V | 5 A</small></div>
+        <div class="battery-2">🔋 BATERAI<div id="bt2">0% terisi</div><div class="bar-2" id="bar2"></div></div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card"><div class="info-val">20 V</div><div class="info-lab">Tegangan (V)</div></div>
+        <div class="info-card"><div class="info-val">5 A</div><div class="info-lab">Arus (I)</div></div>
+        <div class="info-card"><div class="info-val" id="p2">—</div><div class="info-lab">Daya (P)</div></div>
+        <div class="info-card"><div class="info-val" id="e2">—</div><div class="info-lab">Energi (E)</div></div>
+        <div class="info-card"><div class="info-val" id="t2">0 jam</div><div class="info-lab">Waktu (t)</div></div>
+      </div>
+
+      <div class="btn-group">
+        <button onclick="startSim2()">▶ Mulai Pengisian</button>
+        <button class="secondary" onclick="pauseSim2()">Ⅱ Jeda</button>
+        <button class="secondary" onclick="resetSim2()">↻ Ulangi</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📝 Pertanyaan Analisis Kasus 2</h2>
+
+      <div class="question-box">
+        <p>1. Panel surya menghasilkan tegangan 20 V dan arus 5 A. Berapakah daya listrik (P) yang dihasilkan?</p>
+        <textarea id="k2_q1" placeholder="Tuliskan rumus dan perhitungan..."></textarea>
+      </div>
+
+      <div class="question-box">
+        <p>2. Jika panel menghasilkan daya tersebut selama 3 jam, berapakah energi listrik (E) yang dihasilkan (Wh)?</p>
+        <textarea id="k2_q2" placeholder="Tuliskan langkah perhitungan..."></textarea>
+      </div>
+
+      <div class="question-box">
+        <p>3. Baterai membutuhkan energi sebesar 300 Wh. Jika panel menghasilkan daya konstan dari nomor 1, berapa waktu yang diperlukan untuk mengisi penuh baterai?</p>
+        <textarea id="k2_q3" placeholder="Tuliskan langkah perhitungannya..."></textarea>
+      </div>
+
+      <div class="question-box">
+        <p>4. Jika panel bekerja selama 4 jam dengan daya yang sama, berapa energi listrik total yang dihasilkan?</p>
+        <textarea id="k2_q4" placeholder="Tuliskan perhitungan..."></textarea>
+      </div>
+
+      <div class="btn-group" style="justify-content: space-between;">
+        <button class="secondary" onclick="switchTab('tab-2')">⬅ Kembali</button>
+        <button onclick="switchTab('tab-4')">Lanjut ke Studi Kasus 3 ➡</button>
+      </div>
+    </div>
   </div>
 
-  <div class="card">
-    <h2>📈 Grafik Kecepatan–Waktu (v - t)</h2>
-    <canvas id="graph3" width="600" height="350"></canvas>
-  </div>
-</div>
+  <!-- BAGIAN 4: STUDI KASUS 3 -->
+  <div id="tab-4" class="section-page">
+    <div class="card">
+      <h2>🚗 Studi Kasus 3: Analisis Grafik Kecepatan - Waktu</h2>
+      <p>Kendaraan bergerak dari keadaan diam dengan percepatan teratur. Jalankan animasi untuk mencatat data dan memplot grafik.</p>
 
-<div class="card">
-  <h2>📝 Pertanyaan Analisis Kasus 3</h2>
+      <div class="scene-3">
+        <div class="sun-3"></div>
+        <div class="speed-box-3">t = <span id="time3">0.0</span> s &nbsp;|&nbsp; v = <span id="speed3">0.0</span> m/s</div>
+        <div class="car-3" id="car3">
+          <div class="car-roof-3"></div>
+          <div class="car-body-3"></div>
+          <div class="wheel-3 w3-1"></div>
+          <div class="wheel-3 w3-2"></div>
+        </div>
+      </div>
 
-  <div class="question-box">
-    <p>1. Tentukan percepatan (a) kendaraan selama 10 detik berdasarkan data/grafik di atas!</p>
-    <textarea id="k3_q1" placeholder="Tuliskan rumus a = (vt - v0) / t dan langkah perhitungannya..."></textarea>
-  </div>
+      <div class="btn-group">
+        <button id="startBtn3" onclick="startSim3()">▶ Mulai Animasi</button>
+        <button id="pauseBtn3" class="secondary" onclick="pauseSim3()" disabled>⏸ Pause</button>
+        <button class="secondary" onclick="resetSim3()">↻ Ulangi</button>
+      </div>
+    </div>
 
-  <div class="question-box">
-    <p>2. Hitunglah jarak tempuh (s) kendaraan selama t = 10 detik dengan menggunakan rumus GLBB (s = v₀·t + ½·a·t²)!</p>
-    <textarea id="k3_q2" placeholder="Tuliskan langkah perhitungannya..."></textarea>
-  </div>
+    <div class="grid-2col">
+      <div class="card">
+        <h2>📋 Data Pengamatan</h2>
+        <table>
+          <thead>
+            <tr><th>Waktu t (s)</th><th>Kecepatan v (m/s)</th></tr>
+          </thead>
+          <tbody id="dataBody3">
+            <!-- Data otomatis muncul -->
+          </tbody>
+        </table>
+      </div>
 
-  <div class="question-box">
-    <p>3. Berapakah kecepatan kendaraan saat t = 6 detik berdasarkan tabel/grafik?</p>
-    <input type="text" id="k3_q3" placeholder="Tuliskan jawaban Anda...">
-  </div>
+      <div class="card">
+        <h2>📈 Grafik Kecepatan–Waktu</h2>
+        <canvas id="graph3" width="600" height="350"></canvas>
+      </div>
+    </div>
 
-  <div class="question-box">
-    <p>4. Apakah arti fisik dari kemiringan (slope) pada grafik kecepatan–waktu (v - t) tersebut?</p>
-    <textarea id="k3_q4" placeholder="Jelaskan analisis Anda..."></textarea>
-  </div>
+    <div class="card">
+      <h2>📝 Pertanyaan Analisis Kasus 3</h2>
 
-  <div class="question-box">
-    <p>5. Hitunglah jarak tempuh total kendaraan dengan menghitung LUAS daerah di bawah grafik v - t (Luas Segitiga = ½ × alas × tinggi)!</p>
-    <textarea id="k3_q5" placeholder="Tuliskan cara perhitungan luas daerah di bawah grafik..."></textarea>
-  </div>
+      <div class="question-box">
+        <p>1. Tentukan percepatan (a) kendaraan selama 10 detik berdasarkan data/grafik!</p>
+        <textarea id="k3_q1" placeholder="Tuliskan langkah perhitungannya..."></textarea>
+      </div>
 
-  <div class="question-box">
-    <p>6. Bandingkan hasil perhitungan jarak nomor 2 (dengan rumus GLBB) dan nomor 5 (luas daerah grafik). Apakah hasilnya sama? Apa kesimpulan Anda?</p>
-    <textarea id="k3_q6" placeholder="Tuliskan kesimpulan perbandingan Anda..."></textarea>
-  </div>
+      <div class="question-box">
+        <p>2. Tentukan jarak (s) yang ditempuh kendaraan selama 10 detik dengan rumus GLBB!</p>
+        <textarea id="k3_q2" placeholder="Tuliskan langkah perhitungannya..."></textarea>
+      </div>
 
-  <div class="btn-group" style="justify-content: space-between;">
-    <button class="secondary" onclick="switchTab('tab-3')">⬅ Kembali</button>
-    <button onclick="switchTab('tab-5')">Lanjut ke Refleksi & Kirim ➡</button>
-  </div>
-</div>
+      <div class="question-box">
+        <p>3. Berapakah kecepatan kendaraan pada saat t = 6 s?</p>
+        <input type="text" id="k3_q3" placeholder="Tuliskan jawaban Anda...">
+      </div>
 
+      <div class="question-box">
+        <p>4. Apa arti fisik dari kemiringan (slope) pada grafik kecepatan–waktu di atas?</p>
+        <textarea id="k3_q4" placeholder="Jelaskan analisis Anda..."></textarea>
+      </div>
+
+      <div class="question-box">
+        <p>5. Tentukan jarak tempuh kendaraan dengan menghitung LUAS daerah di bawah grafik v - t!</p>
+        <textarea id="k3_q5" placeholder="Tuliskan cara perhitungan luas segitiga grafik..."></textarea>
+      </div>
+
+      <div class="question-box">
+        <p>6. Bandingkan hasil perhitungan nomor 2 (rumus) dengan nomor 5 (luas grafik). Apa kesimpulan Anda?</p>
+        <textarea id="k3_q6" placeholder="Tuliskan kesimpulan perbandingan..."></textarea>
+      </div>
+
+      <div class="btn-group" style="justify-content: space-between;">
+        <button class="secondary" onclick="switchTab('tab-3')">⬅ Kembali</button>
+        <button onclick="switchTab('tab-5')">Lanjut ke Refleksi & Kirim ➡</button>
+      </div>
+    </div>
   </div>
 
   <!-- BAGIAN 5: REFLEKSI & SUBMIT -->
-
   <div id="tab-5" class="section-page">
     <div class="card">
       <h2>💭 Refleksi Pembelajaran Mahasiswa</h2>
+      
+      <div class="question-box">
+        <p>1. Hal baru apa yang Anda pelajari mengenai penerapan konsep Fisika (Kinematika & Energi) serta Matematika Limit pada kendaraan/motor listrik?</p>
+        <textarea id="ref1" placeholder="Tuliskan refleksi Anda..."></textarea>
+      </div>
 
-  <div class="question-box">
-    <p>1. Apakah konsep penting yang Anda pelajari mengenai hubungan jarak, kecepatan, percepatan, serta penggunaan energi panel surya pada kendaraan listrik?</p>
-    <textarea id="ref1" placeholder="Tuliskan refleksi Anda..."></textarea>
-  </div>
+      <div class="question-box">
+        <p>2. Bagian mana dari simulasi interaktif ini yang paling membantu pemahaman Anda? Jelaskan alasannya.</p>
+        <textarea id="ref2" placeholder="Tuliskan pendapat Anda..."></textarea>
+      </div>
 
-  <div class="question-box">
-    <p>2. Bagian simulasi mana (Studi Kasus 1, 2, atau 3) yang paling membantu Anda memahami konsep Fisika ini? Berikan alasannya.</p>
-    <textarea id="ref2" placeholder="Tuliskan pendapat Anda..."></textarea>
-  </div>
+      <div style="background: #e0f2fe; border: 1px solid #bae6fd; padding: 15px; border-radius: 10px; margin-top: 20px;">
+        <p style="margin:0; font-size:13px; color:#0369a1;"><b>📌 Catatan Penting:</b> Pastikan data Identitas Mahasiswa (Nama, NPM, Kelas) serta semua jawaban Studi Kasus 1, 2, dan 3 telah terisi sebelum menekan tombol di bawah ini.</p>
+      </div>
 
-  <div style="background: #e0f2fe; border: 1px solid #bae6fd; padding: 15px; border-radius: 10px; margin-top: 20px;">
-    <p style="margin:0; font-size:13px; color:#0369a1;"><b>📌 Catatan Penting:</b> Pastikan Identitas Mahasiswa (Nama, NPM, Kelas) serta seluruh jawaban Studi Kasus 1, 2, dan 3 telah diisi lengkap sebelum menekan tombol di bawah ini.</p>
-  </div>
-
-  <div class="btn-group" style="justify-content: space-between; margin-top: 20px;">
-    <button class="secondary" onclick="switchTab('tab-4')">⬅ Kembali</button>
-    <button id="submitBtn" onclick="submitLKPD()" style="background: #16a34a; font-size: 16px; padding: 12px 25px;">🚀 Kirim Semua Jawaban ke Spreadsheet</button>
-  </div>
-</div>
-
+      <div class="btn-group" style="justify-content: space-between; margin-top: 20px;">
+        <button class="secondary" onclick="switchTab('tab-4')">⬅ Kembali</button>
+        <button id="submitBtn" onclick="submitLKPD()" style="background: #16a34a; font-size: 16px; padding: 12px 25px;">🚀 Kirim Semua Jawaban ke Spreadsheet</button>
+      </div>
+    </div>
   </div>
 
   <div class="footer">
-    LKPD Digital Fisika Interaktif • Kinematika & Energi Motor Listrik Berdaya Panel Surya
+    LKPD Digital Fisika Interaktif • Dikembangkan untuk Media Pembelajaran Konsep Motor Listrik
   </div>
 
 </div>
@@ -483,7 +507,6 @@ function switchTab(tabId) {
   
   document.getElementById(tabId).classList.add('active');
   
-  // Highlighting tab button
   const tabs = ['tab-0', 'tab-1', 'tab-2', 'tab-3', 'tab-4', 'tab-5'];
   const index = tabs.indexOf(tabId);
   if(index !== -1) {
@@ -523,6 +546,79 @@ function startSim1() {
 }
 function pauseSim1() { running1 = false; last1 = 0; cancelAnimationFrame(frame1); }
 function resetSim1() { running1 = false; last1 = 0; t1 = 0; cancelAnimationFrame(frame1); drawSim1(); }
+
+/* =========================================
+   ANIMASI CANVAS MANDIRI LIMIT KECEPATAN SESAAT (SOAL 4)
+========================================= */
+function drawLimitAnim() {
+  const canvas = document.getElementById("limitCanvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const dt = parseFloat(document.getElementById("dtSlider").value);
+  document.getElementById("dtVal").textContent = dt.toFixed(2);
+
+  const t1 = 3.0;
+  const t2 = t1 + dt;
+  const s1 = t1 * t1 + 2 * t1; // 15
+  const s2 = t2 * t2 + 2 * t2; 
+  const vAvg = (s2 - s1) / dt;
+  
+  document.getElementById("vRataVal").textContent = vAvg.toFixed(2);
+
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  // Skala T: [0, 6] -> [50, W-30], S: [0, 40] -> [H-30, 20]
+  function mapX(t) { return 50 + (t / 6) * (W - 80); }
+  function mapY(s) { return (H - 30) - (s / 40) * (H - 50); }
+
+  // Sumbu Koordinat
+  ctx.strokeStyle = "#475569"; ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(50, 10); ctx.lineTo(50, H - 30); ctx.lineTo(W - 20, H - 30);
+  ctx.stroke();
+
+  // Teks Sumbu
+  ctx.fillStyle = "#94a3b8"; ctx.font = "11px Arial";
+  ctx.fillText("Waktu t (s)", W - 70, H - 10);
+  ctx.fillText("Posisi s (m)", 10, 20);
+
+  // Kurva Posisi s(t) = t^2 + 2t
+  ctx.strokeStyle = "#38bdf8"; ctx.lineWidth = 3;
+  ctx.beginPath();
+  for (let t = 0; t <= 5.5; t += 0.05) {
+    let s = t * t + 2 * t;
+    let x = mapX(t), y = mapY(s);
+    if (t === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Titik P1 (t=3)
+  const x1 = mapX(t1), y1 = mapY(s1);
+  ctx.fillStyle = "#ef4444";
+  ctx.beginPath(); ctx.arc(x1, y1, 6, 0, Math.PI * 2); ctx.fill();
+
+  // Titik P2 (t=3+dt)
+  const x2 = mapX(t2), y2 = mapY(s2);
+  ctx.fillStyle = "#4ade80";
+  ctx.beginPath(); ctx.arc(x2, y2, 6, 0, Math.PI * 2); ctx.fill();
+
+  // Garis Sekan / Tangen
+  ctx.strokeStyle = dt < 0.05 ? "#facc15" : "#f59e0b";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  let dx = x2 - x1, dy = y2 - y1;
+  ctx.moveTo(x1 - dx * 2, y1 - dy * 2);
+  ctx.lineTo(x2 + dx * 2, y2 + dy * 2);
+  ctx.stroke();
+
+  // Label P1
+  ctx.fillStyle = "#ffffff"; ctx.font = "12px Arial";
+  ctx.fillText(`P1 (3s, 15m)`, x1 - 70, y1 - 10);
+  if (dt > 0.2) {
+    ctx.fillText(`P2 (${t2.toFixed(1)}s, ${s2.toFixed(1)}m)`, x2 + 10, y2);
+  }
+}
 
 /* =========================================
    3. LOGIKA SIMULASI KASUS 2 (PANEL SURYA)
@@ -603,11 +699,6 @@ function drawGraph3(currentTime) {
   ctx3.textAlign = "right";
   for (let v = 0; v <= 15; v += 3) ctx3.fillText(v, left - 8, H - bottom - (v / 15) * graphH + 4);
 
-  // Axis Title
-  ctx3.fillStyle = "#0f172a"; ctx3.font = "bold 11px Arial";
-  ctx3.fillText("v (m/s)", left + 15, top - 5);
-  ctx3.fillText("t (s)", W - right, H - bottom + 35);
-
   // Plot Line
   const end = Math.min(currentTime, 10);
   ctx3.strokeStyle = "#e67e22"; ctx3.lineWidth = 3;
@@ -671,7 +762,7 @@ function submitLKPD() {
   const kelas = document.getElementById('kelas').value.trim();
 
   if (!nama || !npm || !kelas) {
-    alert('⚠️ Harap isi Identitas Mahasiswa (Nama, NPM, dan Kelas) terlebih dahulu!');
+    alert('⚠ Harap isi Identitas Mahasiswa (Nama, NPM, dan Kelas) terlebih dahulu!');
     switchTab('tab-0');
     return;
   }
@@ -689,7 +780,9 @@ function submitLKPD() {
     k1_q1: document.getElementById('k1_q1').value,
     k1_q2: document.getElementById('k1_q2').value,
     k1_q3: document.getElementById('k1_q3').value,
-    k1_q4: document.getElementById('k1_q4').value,
+    k1_q4_a: document.getElementById('k1_q4_a').value,
+    k1_q4_b: document.getElementById('k1_q4_b').value,
+    k1_q5: document.getElementById('k1_q5').value,
     
     // Studi Kasus 2
     k2_q1: document.getElementById('k2_q1').value,
@@ -730,4 +823,9 @@ function submitLKPD() {
 
 // Inisialisasi awal
 drawSim1();
+drawLimitAnim();
 drawSim2();
+drawGraph3(0);
+</script>
+</body>
+</html>
